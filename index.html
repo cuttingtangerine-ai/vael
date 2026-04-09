@@ -1210,7 +1210,7 @@ async function sendMessage() {
       }))
     ];
 
-    const res = await fetch('https://corsproxy.io/?url=https://api.deepseek.com/chat/completions', {
+    const res = await fetch('https://vael-api.cuttingtangerine.workers.dev', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -1510,7 +1510,7 @@ async function sendGift() {
   showToast('正在等Vael的反应…');
 
   try {
-    const res = await fetch('https://corsproxy.io/?url=https://api.deepseek.com/chat/completions', {
+    const res = await fetch('https://vael-api.cuttingtangerine.workers.dev', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + API_KEY },
       body: JSON.stringify({
@@ -1537,7 +1537,7 @@ async function sendGift() {
 async function vaelSendsGift() {
   showToast('Vael在准备一件礼物…');
   try {
-    const res = await fetch('https://corsproxy.io/?url=https://api.deepseek.com/chat/completions', {
+    const res = await fetch('https://vael-api.cuttingtangerine.workers.dev', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + API_KEY },
       body: JSON.stringify({
