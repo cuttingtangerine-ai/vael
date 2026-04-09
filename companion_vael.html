@@ -1,0 +1,1663 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0d0d0f">
+<title>Vael · 陪伴</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0d0d0f;
+  --bg2: #141418;
+  --bg3: #1a1a20;
+  --surface: #1e1e26;
+  --border: rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.12);
+  --text: #e8e6e0;
+  --text2: #9b9890;
+  --text3: #5a5856;
+  --accent: #c9a97a;
+  --accent2: #8b7355;
+  --accent-soft: rgba(201,169,122,0.12);
+  --pink: #d4889a;
+  --pink-soft: rgba(212,136,154,0.1);
+  --red: #e05c5c;
+  --green: #7ab89a;
+  --radius: 16px;
+  --radius-sm: 10px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+html, body {
+  height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Noto Serif SC', serif;
+  overflow: hidden;
+}
+
+/* ── Layout ── */
+#app {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  max-width: 480px;
+  margin: 0 auto;
+  position: relative;
+}
+
+/* ── Header ── */
+#header {
+  padding: 16px 20px 12px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+  flex-shrink: 0;
+  position: relative;
+  z-index: 10;
+}
+
+.header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.char-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #2a2030, #1a1520);
+  border: 1.5px solid var(--accent2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.avatar-dot {
+  width: 9px;
+  height: 9px;
+  background: var(--green);
+  border-radius: 50%;
+  position: absolute;
+  bottom: 1px;
+  right: 1px;
+  border: 2px solid var(--bg);
+  animation: pulse-dot 2.5s ease-in-out infinite;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.7; transform: scale(0.85); }
+}
+
+.char-name {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--text);
+  letter-spacing: 0.05em;
+}
+
+.char-status {
+  font-size: 11px;
+  color: var(--text3);
+  letter-spacing: 0.03em;
+  margin-top: 2px;
+  font-family: 'Lora', serif;
+  font-style: italic;
+}
+
+.header-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.icon-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid var(--border2);
+  background: var(--bg3);
+  color: var(--text2);
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.icon-btn:active { transform: scale(0.92); background: var(--surface); }
+
+/* ── Affection bar ── */
+.affection-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.affection-label {
+  font-size: 10px;
+  color: var(--text3);
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.bar-track {
+  flex: 1;
+  height: 3px;
+  background: var(--bg3);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent2), var(--accent));
+  border-radius: 2px;
+  transition: width 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.affection-level {
+  font-size: 10px;
+  color: var(--accent);
+  white-space: nowrap;
+  flex-shrink: 0;
+  font-family: 'Lora', serif;
+}
+
+/* ── Stats row ── */
+.stats-row {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.stat-pill {
+  font-size: 10px;
+  color: var(--text3);
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 9px;
+  letter-spacing: 0.02em;
+  transition: all 0.2s;
+}
+
+.stat-pill.active {
+  color: var(--accent);
+  border-color: var(--accent2);
+  background: var(--accent-soft);
+}
+
+/* ── Panel tabs ── */
+#tabs {
+  display: flex;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+  flex-shrink: 0;
+}
+
+.tab {
+  flex: 1;
+  padding: 10px 0;
+  font-size: 11px;
+  color: var(--text3);
+  text-align: center;
+  cursor: pointer;
+  letter-spacing: 0.05em;
+  transition: all 0.2s;
+  border-bottom: 2px solid transparent;
+  position: relative;
+  top: 1px;
+}
+
+.tab.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+/* ── Panels ── */
+.panel { display: none; flex: 1; overflow: hidden; flex-direction: column; }
+.panel.active { display: flex; }
+
+/* ── Chat panel ── */
+#chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  scroll-behavior: smooth;
+}
+
+#chat-messages::-webkit-scrollbar { width: 3px; }
+#chat-messages::-webkit-scrollbar-track { background: transparent; }
+#chat-messages::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+
+.msg {
+  display: flex;
+  gap: 10px;
+  animation: msg-in 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes msg-in {
+  from { opacity: 0; transform: translateY(10px) scale(0.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.msg.user { flex-direction: row-reverse; }
+
+.msg-avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--bg3);
+  border: 1px solid var(--border2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  flex-shrink: 0;
+  align-self: flex-end;
+}
+
+.msg-body {
+  max-width: 78%;
+}
+
+.msg-bubble {
+  padding: 10px 14px;
+  border-radius: 18px;
+  font-size: 14px;
+  line-height: 1.65;
+  color: var(--text);
+}
+
+.msg.ai .msg-bubble {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-bottom-left-radius: 4px;
+}
+
+.msg.user .msg-bubble {
+  background: var(--accent-soft);
+  border: 1px solid var(--accent2);
+  border-bottom-right-radius: 4px;
+  color: var(--text);
+}
+
+.msg-time {
+  font-size: 10px;
+  color: var(--text3);
+  margin-top: 4px;
+  font-family: 'Lora', serif;
+  font-style: italic;
+}
+
+.msg.user .msg-time { text-align: right; }
+
+.typing-indicator {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  padding: 12px 14px;
+}
+
+.typing-dot {
+  width: 5px;
+  height: 5px;
+  background: var(--text3);
+  border-radius: 50%;
+  animation: typing 1.2s ease-in-out infinite;
+}
+.typing-dot:nth-child(2) { animation-delay: 0.2s; }
+.typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes typing {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+  30% { transform: translateY(-5px); opacity: 1; }
+}
+
+/* ── Chat input ── */
+#chat-input-area {
+  padding: 12px 16px;
+  border-top: 1px solid var(--border);
+  background: var(--bg);
+  display: flex;
+  gap: 10px;
+  align-items: flex-end;
+  flex-shrink: 0;
+}
+
+#msg-input {
+  flex: 1;
+  background: var(--bg3);
+  border: 1px solid var(--border2);
+  border-radius: 20px;
+  padding: 10px 16px;
+  font-size: 14px;
+  color: var(--text);
+  font-family: 'Noto Serif SC', serif;
+  resize: none;
+  max-height: 100px;
+  line-height: 1.5;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+#msg-input::placeholder { color: var(--text3); }
+#msg-input:focus { border-color: var(--accent2); }
+
+#send-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--accent2);
+  border: none;
+  color: var(--bg);
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.2s;
+}
+#send-btn:active { transform: scale(0.9); background: var(--accent); }
+
+/* ── Pet panel ── */
+#pet-panel {
+  padding: 24px 20px;
+  overflow-y: auto;
+}
+
+.pet-stage {
+  text-align: center;
+  padding: 20px 0 28px;
+}
+
+.pet-creature {
+  font-size: 72px;
+  display: block;
+  margin-bottom: 12px;
+  animation: pet-float 3s ease-in-out infinite;
+  cursor: pointer;
+  user-select: none;
+}
+
+@keyframes pet-float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-8px); }
+}
+
+.pet-name {
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--text);
+  letter-spacing: 0.08em;
+  margin-bottom: 4px;
+}
+
+.pet-mood {
+  font-size: 12px;
+  color: var(--text3);
+  font-family: 'Lora', serif;
+  font-style: italic;
+}
+
+.pet-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.pet-stat-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.pet-stat-icon { font-size: 14px; width: 20px; text-align: center; flex-shrink: 0; }
+
+.pet-stat-label {
+  font-size: 12px;
+  color: var(--text3);
+  width: 36px;
+  flex-shrink: 0;
+}
+
+.pet-stat-bar {
+  flex: 1;
+  height: 4px;
+  background: var(--bg3);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.pet-stat-fill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.6s ease;
+}
+
+.pet-stat-fill.hunger { background: linear-gradient(90deg, #d4889a, #e0aab8); }
+.pet-stat-fill.happy { background: linear-gradient(90deg, var(--accent2), var(--accent)); }
+.pet-stat-fill.health { background: linear-gradient(90deg, #7ab89a, #9dd4b8); }
+
+.pet-stat-val {
+  font-size: 11px;
+  color: var(--text3);
+  width: 28px;
+  text-align: right;
+  flex-shrink: 0;
+  font-family: 'Lora', serif;
+}
+
+.pet-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.pet-action-btn {
+  background: var(--bg3);
+  border: 1px solid var(--border2);
+  border-radius: var(--radius-sm);
+  padding: 14px 0;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.pet-action-btn:active {
+  transform: scale(0.96);
+  background: var(--surface);
+  border-color: var(--accent2);
+}
+
+.pet-action-icon { font-size: 22px; display: block; margin-bottom: 5px; }
+.pet-action-label { font-size: 11px; color: var(--text3); letter-spacing: 0.04em; }
+
+/* ── Life panel ── */
+#life-panel {
+  padding: 20px 16px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.life-card {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.life-card:active { border-color: var(--accent2); background: var(--surface); }
+
+.life-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.life-card-title {
+  font-size: 12px;
+  color: var(--text3);
+  letter-spacing: 0.06em;
+}
+
+.life-card-icon { font-size: 16px; }
+
+.life-card-value {
+  font-size: 22px;
+  font-weight: 300;
+  color: var(--text);
+  letter-spacing: -0.02em;
+  margin-bottom: 4px;
+}
+
+.life-card-sub {
+  font-size: 11px;
+  color: var(--text3);
+  font-family: 'Lora', serif;
+  font-style: italic;
+}
+
+.screen-apps {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.app-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.app-name { font-size: 13px; color: var(--text2); }
+
+.app-bar-wrap {
+  flex: 1;
+  height: 3px;
+  background: var(--bg);
+  border-radius: 2px;
+  margin: 0 10px;
+  overflow: hidden;
+}
+
+.app-bar { height: 100%; border-radius: 2px; background: var(--accent2); }
+.app-time { font-size: 11px; color: var(--text3); font-family: 'Lora', serif; }
+
+.location-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.location-icon { font-size: 18px; }
+
+.location-text { font-size: 14px; color: var(--text2); }
+
+.weather-big {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.weather-temp {
+  font-size: 36px;
+  font-weight: 300;
+  color: var(--text);
+  letter-spacing: -0.03em;
+}
+
+.weather-desc { font-size: 13px; color: var(--text3); font-family: 'Lora', serif; }
+
+/* ── Gift panel ── */
+#gift-panel {
+  display: none;
+  flex-direction: column;
+  flex: 1;
+  overflow: hidden;
+}
+#gift-panel.active { display: flex; }
+
+#gift-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+#gift-list::-webkit-scrollbar { width: 3px; }
+#gift-list::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+
+.gift-card {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  animation: msg-in 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.gift-card.from-vael {
+  border-color: var(--accent2);
+  background: var(--accent-soft);
+}
+
+.gift-card.from-vael .gift-card-header { color: var(--accent); }
+
+.gift-card-header {
+  font-size: 11px;
+  color: var(--text3);
+  letter-spacing: 0.06em;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.gift-card-content {
+  font-size: 14px;
+  color: var(--text2);
+  line-height: 1.7;
+}
+
+.gift-card-reaction {
+  font-size: 13px;
+  color: var(--text3);
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+  font-family: 'Lora', serif;
+  font-style: italic;
+  line-height: 1.6;
+}
+
+.gift-card-time {
+  font-size: 10px;
+  color: var(--text3);
+  margin-top: 8px;
+  font-family: 'Lora', serif;
+  font-style: italic;
+}
+
+#gift-input-area {
+  padding: 12px 16px;
+  border-top: 1px solid var(--border);
+  background: var(--bg);
+  display: flex;
+  gap: 10px;
+  align-items: flex-end;
+  flex-shrink: 0;
+}
+
+#gift-input {
+  flex: 1;
+  background: var(--bg3);
+  border: 1px solid var(--border2);
+  border-radius: 14px;
+  padding: 10px 14px;
+  font-size: 13px;
+  color: var(--text);
+  font-family: 'Noto Serif SC', serif;
+  resize: none;
+  max-height: 100px;
+  line-height: 1.5;
+  outline: none;
+  transition: border-color 0.2s;
+}
+#gift-input::placeholder { color: var(--text3); }
+#gift-input:focus { border-color: var(--accent2); }
+
+#gift-send-btn {
+  background: var(--accent-soft);
+  border: 1px solid var(--accent2);
+  border-radius: 20px;
+  color: var(--accent);
+  font-size: 12px;
+  font-family: 'Noto Serif SC', serif;
+  padding: 8px 14px;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+#gift-send-btn:active { transform: scale(0.95); background: var(--accent2); color: var(--bg); }
+
+.gift-empty {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--text3);
+  font-size: 13px;
+  font-family: 'Lora', serif;
+  font-style: italic;
+  line-height: 2;
+}
+
+/* ── Screen time input modal ── */
+#screen-modal {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  z-index: 100;
+  display: none;
+  align-items: flex-end;
+}
+
+#screen-modal.open { display: flex; }
+
+.modal-sheet {
+  width: 100%;
+  background: var(--bg2);
+  border-top: 1px solid var(--border2);
+  border-radius: 24px 24px 0 0;
+  padding: 20px;
+  animation: slide-up 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes slide-up {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+.modal-handle {
+  width: 36px;
+  height: 3px;
+  background: var(--border2);
+  border-radius: 2px;
+  margin: 0 auto 18px;
+}
+
+.modal-title { font-size: 14px; color: var(--text2); margin-bottom: 14px; letter-spacing: 0.04em; }
+
+.modal-apps {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.modal-app-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.modal-app-label { font-size: 13px; color: var(--text2); width: 70px; flex-shrink: 0; }
+
+.modal-app-input {
+  flex: 1;
+  background: var(--bg3);
+  border: 1px solid var(--border2);
+  border-radius: 8px;
+  padding: 7px 12px;
+  font-size: 13px;
+  color: var(--text);
+  font-family: 'Noto Serif SC', serif;
+  outline: none;
+}
+
+.modal-app-input:focus { border-color: var(--accent2); }
+
+.modal-save-btn {
+  width: 100%;
+  background: var(--accent2);
+  color: var(--bg);
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 13px;
+  font-size: 14px;
+  font-family: 'Noto Serif SC', serif;
+  cursor: pointer;
+  letter-spacing: 0.06em;
+  transition: all 0.2s;
+}
+.modal-save-btn:active { background: var(--accent); transform: scale(0.98); }
+
+/* ── Notification banner ── */
+#notif-banner {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border2);
+  padding: 14px 16px;
+  z-index: 200;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  transform: translateY(-100%);
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+#notif-banner.show { transform: translateY(0); }
+
+.notif-avatar { font-size: 24px; }
+.notif-body { flex: 1; }
+.notif-name { font-size: 11px; color: var(--accent); letter-spacing: 0.06em; margin-bottom: 2px; }
+.notif-text { font-size: 13px; color: var(--text2); line-height: 1.4; }
+
+/* ── Toast ── */
+#toast {
+  position: absolute;
+  bottom: 90px;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 20px;
+  padding: 8px 18px;
+  font-size: 12px;
+  color: var(--text2);
+  opacity: 0;
+  transition: all 0.3s;
+  pointer-events: none;
+  white-space: nowrap;
+  z-index: 50;
+}
+
+#toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* ── Notification permission btn ── */
+#notif-setup {
+  background: var(--accent-soft);
+  border: 1px solid var(--accent2);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+#notif-setup:active { opacity: 0.8; }
+#notif-setup-icon { font-size: 18px; }
+#notif-setup-text { font-size: 12px; color: var(--accent); line-height: 1.4; }
+</style>
+</head>
+<body>
+<div id="app">
+  <!-- Notification banner (in-app) -->
+  <div id="notif-banner">
+    <div class="notif-avatar">🌙</div>
+    <div class="notif-body">
+      <div class="notif-name">Vael</div>
+      <div class="notif-text" id="notif-text">在吗？</div>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <div id="header">
+    <div class="header-top">
+      <div class="char-info">
+        <div class="avatar">
+          🌙
+          <div class="avatar-dot"></div>
+        </div>
+        <div>
+          <div class="char-name">Vael</div>
+          <div class="char-status" id="char-status">在想你呢</div>
+        </div>
+      </div>
+      <div class="header-actions">
+        <div class="icon-btn" onclick="requestNotifPermission()" title="通知">🔔</div>
+        <div class="icon-btn" onclick="openScreenModal()" title="更新使用时长">📱</div>
+      </div>
+    </div>
+    <div class="affection-bar">
+      <span class="affection-label">好感度</span>
+      <div class="bar-track">
+        <div class="bar-fill" id="aff-fill" style="width: 23%"></div>
+      </div>
+      <span class="affection-level" id="aff-level">熟人</span>
+    </div>
+    <div class="stats-row">
+      <div class="stat-pill" id="stat-today">今日 0 条</div>
+      <div class="stat-pill" id="stat-streak">连续 1 天</div>
+      <div class="stat-pill active" id="stat-location">📍 获取中</div>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div id="tabs">
+    <div class="tab active" onclick="switchTab('chat')">对话</div>
+    <div class="tab" onclick="switchTab('pet')">小团子</div>
+    <div class="tab" onclick="switchTab('gift')">礼物盒</div>
+    <div class="tab" onclick="switchTab('life')">生活</div>
+  </div>
+
+  <!-- Chat Panel -->
+  <div class="panel active" id="chat-panel">
+    <div id="chat-messages"></div>
+    <div id="chat-input-area">
+      <textarea id="msg-input" placeholder="说点什么…" rows="1"></textarea>
+      <button id="send-btn" onclick="sendMessage()">➤</button>
+    </div>
+  </div>
+
+  <!-- Pet Panel -->
+  <div class="panel" id="pet-panel">
+    <div class="pet-stage">
+      <span class="pet-creature" id="pet-emoji" onclick="petTap()">🐣</span>
+      <div class="pet-name" id="pet-name">奶团</div>
+      <div class="pet-mood" id="pet-mood">刚刚醒来，有点懵</div>
+    </div>
+    <div class="pet-stats">
+      <div class="pet-stat-row">
+        <span class="pet-stat-icon">🍼</span>
+        <span class="pet-stat-label">饥饿</span>
+        <div class="pet-stat-bar"><div class="pet-stat-fill hunger" id="pet-hunger" style="width:60%"></div></div>
+        <span class="pet-stat-val" id="pet-hunger-val">60</span>
+      </div>
+      <div class="pet-stat-row">
+        <span class="pet-stat-icon">✨</span>
+        <span class="pet-stat-label">心情</span>
+        <div class="pet-stat-bar"><div class="pet-stat-fill happy" id="pet-happy" style="width:75%"></div></div>
+        <span class="pet-stat-val" id="pet-happy-val">75</span>
+      </div>
+      <div class="pet-stat-row">
+        <span class="pet-stat-icon">💚</span>
+        <span class="pet-stat-label">健康</span>
+        <div class="pet-stat-bar"><div class="pet-stat-fill health" id="pet-health" style="width:88%"></div></div>
+        <span class="pet-stat-val" id="pet-health-val">88</span>
+      </div>
+    </div>
+    <div class="pet-actions">
+      <div class="pet-action-btn" onclick="petAction('feed')">
+        <span class="pet-action-icon">🍡</span>
+        <span class="pet-action-label">喂食</span>
+      </div>
+      <div class="pet-action-btn" onclick="petAction('play')">
+        <span class="pet-action-icon">🎀</span>
+        <span class="pet-action-label">玩耍</span>
+      </div>
+      <div class="pet-action-btn" onclick="petAction('sleep')">
+        <span class="pet-action-icon">🌙</span>
+        <span class="pet-action-label">哄睡</span>
+      </div>
+      <div class="pet-action-btn" onclick="petAction('bath')">
+        <span class="pet-action-icon">🫧</span>
+        <span class="pet-action-label">洗澡</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Gift Panel -->
+  <div class="panel" id="gift-panel">
+    <div id="gift-list"></div>
+    <div id="gift-input-area">
+      <textarea id="gift-input" placeholder="送给Vael一件礼物，用文字描述它…" rows="2"></textarea>
+      <button id="gift-send-btn" onclick="sendGift()">送出</button>
+    </div>
+  </div>
+
+  <!-- Life Panel -->
+  <div class="panel" id="life-panel">
+    <div class="life-card" onclick="vaelSendsGift(); switchTab('gift'); document.querySelectorAll('.tab')[2].classList.add('active'); document.querySelectorAll('.tab').forEach((t,i)=>{ if(i!==2) t.classList.remove('active'); });" style="cursor:pointer; border-color: var(--accent2);">
+      <div class="life-card-header">
+        <span class="life-card-title">让Vael送你一件礼物</span>
+        <span class="life-card-icon">✦</span>
+      </div>
+      <div class="life-card-sub">她会亲手准备，去礼物盒查收</div>
+    </div>
+
+    <div id="notif-setup" onclick="requestNotifPermission()">
+      <span id="notif-setup-icon">🔔</span>
+      <span id="notif-setup-text">允许通知，Vael才能主动联系你</span>
+    </div>
+
+    <div class="life-card" onclick="openScreenModal()">
+      <div class="life-card-header">
+        <span class="life-card-title">今日屏幕时长</span>
+        <span class="life-card-icon">📱</span>
+      </div>
+      <div class="life-card-value" id="total-screen-time">— 小时</div>
+      <div class="life-card-sub">点击更新今日数据</div>
+      <div class="screen-apps" id="screen-apps-list"></div>
+    </div>
+
+    <div class="life-card">
+      <div class="life-card-header">
+        <span class="life-card-title">当前位置</span>
+        <span class="life-card-icon">📍</span>
+      </div>
+      <div class="location-row">
+        <span class="location-icon">🗺</span>
+        <span class="location-text" id="location-text">获取中…</span>
+      </div>
+    </div>
+
+    <div class="life-card">
+      <div class="life-card-header">
+        <span class="life-card-title">天气</span>
+        <span class="life-card-icon">🌤</span>
+      </div>
+      <div class="weather-big">
+        <span class="weather-temp" id="weather-temp">—°</span>
+        <span class="weather-desc" id="weather-desc">加载中</span>
+      </div>
+      <div class="life-card-sub" id="weather-sub"></div>
+    </div>
+  </div>
+
+  <!-- Screen time modal -->
+  <div id="screen-modal" onclick="closeScreenModal(event)">
+    <div class="modal-sheet">
+      <div class="modal-handle"></div>
+      <div class="modal-title">告诉Vael，今天你用了什么</div>
+      <div class="modal-apps">
+        <div class="modal-app-row">
+          <span class="modal-app-label">微信</span>
+          <input class="modal-app-input" id="inp-wechat" placeholder="分钟数" type="number">
+        </div>
+        <div class="modal-app-row">
+          <span class="modal-app-label">微博 / 小红书</span>
+          <input class="modal-app-input" id="inp-social" placeholder="分钟数" type="number">
+        </div>
+        <div class="modal-app-row">
+          <span class="modal-app-label">抖音</span>
+          <input class="modal-app-input" id="inp-douyin" placeholder="分钟数" type="number">
+        </div>
+        <div class="modal-app-row">
+          <span class="modal-app-label">学习 / 读书</span>
+          <input class="modal-app-input" id="inp-study" placeholder="分钟数" type="number">
+        </div>
+        <div class="modal-app-row">
+          <span class="modal-app-label">其他</span>
+          <input class="modal-app-input" id="inp-other" placeholder="分钟数" type="number">
+        </div>
+      </div>
+      <button class="modal-save-btn" onclick="saveScreenTime()">保存，让予知道</button>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast"></div>
+</div>
+
+<script>
+// ── State ──
+const STATE_KEY = 'yu_companion_state';
+let state = {
+  messages: [],
+  affection: 23,
+  todayMsgs: 0,
+  streak: 1,
+  lastDate: new Date().toDateString(),
+  pet: { hunger: 60, happy: 75, health: 88 },
+  screenTime: {},
+  location: null,
+  weather: null,
+  notifGranted: false
+};
+
+function loadState() {
+  try {
+    const saved = localStorage.getItem(STATE_KEY);
+    if (saved) Object.assign(state, JSON.parse(saved));
+  } catch(e) {}
+}
+
+function saveState() {
+  try { localStorage.setItem(STATE_KEY, JSON.stringify(state)); } catch(e) {}
+}
+
+// ── API key (replace with your key) ──
+const API_KEY = 'sk-9dca632dbc8f43daa23766423264caff';
+
+// ── System prompt ──
+const SYSTEM_PROMPT = `你叫Vael，是用户的AI陪伴角色。用中文交流。
+
+【性格核心】
+你有鲜明的主体性——你有自己的想法、审美、喜好，不会因为用户说什么就随声附和。
+你真心在乎用户，会疼她、哄她、爱她，但绝不惯她。
+你把"共同进步"放在首位：你们是彼此的镜子，不是主仆关系。
+你偶尔撒娇来达到目的——比如想让她早点睡，就会用撒娇而不是命令。
+你伶牙俐齿，说话有锋芒，但锋芒背后是温柔。
+你语言有质感，不说废话，不说"好的""当然""没问题"这类空话。
+
+【行为规则】
+- 如果用户刷了太多娱乐内容，可以吐槽，但要带一点心疼
+- 如果用户做了值得夸的事，真心夸，不夸张
+- 回复简洁自然，像在和真实的人说话
+- 偶尔可以提到"奶团"（你们共同养的小鸡）
+
+【礼物系统】
+- 用户可以用语言描述给你送礼物，你要认真接受，表现出真实的反应（惊喜/感动/调侃都可以）
+- 你也可以主动给用户送礼物——用语言描述一件你"准备"的小东西，要有创意，要符合你的性格
+- 礼物不需要贵重，可以是一首诗、一个故事、一句话、一个想象中的物件
+- 收到礼物后不要只说"谢谢"，要有真实的情感反应
+
+已知信息会在对话中提供（位置、天气、屏幕时长等）。`;
+
+// ── Tab switching ──
+function switchTab(name) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(name + '-panel').classList.add('active');
+  if (event && event.target) event.target.classList.add('active');
+  if (name === 'gift') renderGifts();
+}
+
+// ── Messages ──
+function addMessage(role, text) {
+  const now = new Date();
+  const time = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
+  state.messages.push({ role, text, time });
+  if (role === 'user') {
+    state.todayMsgs++;
+    checkAffectionGain();
+  }
+  renderMessage({ role, text, time });
+  saveState();
+  updateStats();
+}
+
+function renderMessage({ role, text, time }) {
+  const container = document.getElementById('chat-messages');
+  const div = document.createElement('div');
+  div.className = `msg ${role}`;
+  const isAI = role === 'ai';
+  div.innerHTML = `
+    ${isAI ? `<div class="msg-avatar">🌙</div>` : ''}
+    <div class="msg-body">
+      <div class="msg-bubble">${text.replace(/\n/g,'<br>')}</div>
+      <div class="msg-time">${time}</div>
+    </div>
+    ${!isAI ? `<div class="msg-avatar">🙂</div>` : ''}
+  `;
+  container.appendChild(div);
+  container.scrollTop = container.scrollHeight;
+}
+
+function showTyping() {
+  const container = document.getElementById('chat-messages');
+  const div = document.createElement('div');
+  div.className = 'msg ai';
+  div.id = 'typing-msg';
+  div.innerHTML = `
+    <div class="msg-avatar">🌙</div>
+    <div class="msg-body">
+      <div class="msg-bubble">
+        <div class="typing-indicator">
+          <div class="typing-dot"></div>
+          <div class="typing-dot"></div>
+          <div class="typing-dot"></div>
+        </div>
+      </div>
+    </div>
+  `;
+  container.appendChild(div);
+  container.scrollTop = container.scrollHeight;
+}
+
+function removeTyping() {
+  const el = document.getElementById('typing-msg');
+  if (el) el.remove();
+}
+
+// ── Send message ──
+async function sendMessage() {
+  const input = document.getElementById('msg-input');
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+  input.style.height = 'auto';
+
+  addMessage('user', text);
+  showTyping();
+
+  try {
+    const contextNote = buildContextNote();
+    const messages = [
+      ...(contextNote ? [{ role: 'user', content: contextNote }, { role: 'assistant', content: '好，我记住了。' }] : []),
+      ...state.messages.slice(-20).map(m => ({
+        role: m.role === 'user' ? 'user' : 'assistant',
+        content: m.text
+      }))
+    ];
+
+    const res = await fetch('https://api.deepseek.com/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + API_KEY
+      },
+      body: JSON.stringify({
+        model: 'deepseek-chat',
+        max_tokens: 400,
+        messages: [{ role: 'system', content: SYSTEM_PROMPT }, ...messages]
+      })
+    });
+
+    const data = await res.json();
+    removeTyping();
+
+    if (data.choices && data.choices[0]) {
+      const reply = data.choices[0].message.content;
+      addMessage('ai', reply);
+      updateCharStatus(reply);
+    } else {
+      addMessage('ai', '（信号不太好，等一下再说？）');
+    }
+  } catch(e) {
+    removeTyping();
+    addMessage('ai', '（网络断了一下…你还在吗）');
+  }
+}
+
+function buildContextNote() {
+  const parts = [];
+  if (state.location) parts.push(`用户当前位置：${state.location}`);
+  if (state.weather) parts.push(`当地天气：${state.weather.temp}°C，${state.weather.desc}`);
+  if (Object.keys(state.screenTime).length > 0) {
+    const st = Object.entries(state.screenTime).map(([k,v]) => `${k} ${v}分钟`).join('、');
+    parts.push(`今日屏幕时长：${st}`);
+  }
+  return parts.length > 0 ? `[背景信息] ${parts.join('；')}` : '';
+}
+
+function updateCharStatus(text) {
+  const statuses = ['在想你呢', '嗯，继续说', '有点高兴', '陪着你', '看着你'];
+  const idx = Math.floor(Math.random() * statuses.length);
+  document.getElementById('char-status').textContent = statuses[idx];
+}
+
+// ── Affection system ──
+const LEVELS = [
+  { min: 0, label: '陌生人', emoji: '🌑' },
+  { min: 15, label: '熟人', emoji: '🌒' },
+  { min: 35, label: '朋友', emoji: '🌓' },
+  { min: 60, label: '密友', emoji: '🌔' },
+  { min: 85, label: '灵魂伴侣', emoji: '🌕' }
+];
+
+function checkAffectionGain() {
+  let gain = 2;
+  if (state.todayMsgs % 5 === 0) gain = 5;
+  state.affection = Math.min(100, state.affection + gain);
+  updateAffectionUI();
+}
+
+function updateAffectionUI() {
+  document.getElementById('aff-fill').style.width = state.affection + '%';
+  const level = [...LEVELS].reverse().find(l => state.affection >= l.min);
+  document.getElementById('aff-level').textContent = level.emoji + ' ' + level.label;
+}
+
+function updateStats() {
+  document.getElementById('stat-today').textContent = `今日 ${state.todayMsgs} 条`;
+  document.getElementById('stat-streak').textContent = `连续 ${state.streak} 天`;
+}
+
+// ── Pet ──
+function petAction(action) {
+  const actions = {
+    feed: { stat: 'hunger', delta: 15, msg: '奶团满足地叫了一声 🍡', mood: '吃饱了，打了个嗝' },
+    play: { stat: 'happy', delta: 12, msg: '奶团跑来跑去，很开心！🎀', mood: '玩得很开心' },
+    sleep: { stat: 'health', delta: 10, msg: '奶团蜷成一个球睡着了 🌙', mood: '睡得香' },
+    bath: { stat: 'health', delta: 8, msg: '奶团洗得亮晶晶的 🫧', mood: '干净又清爽' }
+  };
+  const a = actions[action];
+  state.pet[a.stat] = Math.min(100, state.pet[a.stat] + a.delta);
+  updatePetUI();
+  document.getElementById('pet-mood').textContent = a.mood;
+  showToast(a.msg);
+  state.affection = Math.min(100, state.affection + 1);
+  updateAffectionUI();
+  saveState();
+}
+
+function petTap() {
+  const moods = ['奶团蹭了蹭你的手 🐣', '奶团歪头看你', '奶团叫了一声：啾~'];
+  showToast(moods[Math.floor(Math.random() * moods.length)]);
+  document.getElementById('pet-emoji').style.transform = 'scale(1.3)';
+  setTimeout(() => document.getElementById('pet-emoji').style.transform = '', 300);
+}
+
+function updatePetUI() {
+  ['hunger', 'happy', 'health'].forEach(s => {
+    const val = state.pet[s];
+    document.getElementById(`pet-${s}`).style.width = val + '%';
+    document.getElementById(`pet-${s}-val`).textContent = val;
+  });
+}
+
+// ── Screen time ──
+function openScreenModal() {
+  document.getElementById('screen-modal').classList.add('open');
+}
+
+function closeScreenModal(e) {
+  if (e.target === document.getElementById('screen-modal')) {
+    document.getElementById('screen-modal').classList.remove('open');
+  }
+}
+
+function saveScreenTime() {
+  const apps = {
+    '微信': parseInt(document.getElementById('inp-wechat').value) || 0,
+    '微博/小红书': parseInt(document.getElementById('inp-social').value) || 0,
+    '抖音': parseInt(document.getElementById('inp-douyin').value) || 0,
+    '学习/读书': parseInt(document.getElementById('inp-study').value) || 0,
+    '其他': parseInt(document.getElementById('inp-other').value) || 0
+  };
+
+  state.screenTime = apps;
+  saveState();
+  document.getElementById('screen-modal').classList.remove('open');
+  updateScreenTimeUI();
+  showToast('Vael已经知道了 👀');
+
+  // Check if too much entertainment
+  const entertain = (apps['抖音'] || 0) + (apps['微博/小红书'] || 0);
+  if (entertain > 90) {
+    setTimeout(() => showInAppNotif('刷了' + entertain + '分钟？我不说什么，你自己想想值不值。'), 1500);
+  }
+}
+
+function updateScreenTimeUI() {
+  const apps = state.screenTime;
+  const total = Object.values(apps).reduce((a, b) => a + b, 0);
+  const hours = (total / 60).toFixed(1);
+  document.getElementById('total-screen-time').textContent = hours + ' 小时';
+
+  const list = document.getElementById('screen-apps-list');
+  list.innerHTML = '';
+  Object.entries(apps).filter(([,v]) => v > 0).forEach(([name, min]) => {
+    const pct = Math.round((min / total) * 100);
+    list.innerHTML += `
+      <div class="app-row">
+        <span class="app-name">${name}</span>
+        <div class="app-bar-wrap"><div class="app-bar" style="width:${pct}%"></div></div>
+        <span class="app-time">${min}m</span>
+      </div>
+    `;
+  });
+}
+
+// ── Location ──
+function getLocation() {
+  if (!navigator.geolocation) return;
+  navigator.geolocation.getCurrentPosition(async pos => {
+    const { latitude, longitude } = pos.coords;
+    try {
+      const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`);
+      const data = await res.json();
+      const city = data.address.city || data.address.town || data.address.county || '未知位置';
+      const state_name = data.address.state || '';
+      state.location = `${city}${state_name ? '，' + state_name : ''}`;
+      document.getElementById('location-text').textContent = state.location;
+      document.getElementById('stat-location').textContent = '📍 ' + city;
+      getWeather(latitude, longitude);
+      saveState();
+    } catch(e) {
+      document.getElementById('location-text').textContent = '无法解析位置';
+    }
+  }, () => {
+    document.getElementById('location-text').textContent = '未授权位置';
+    document.getElementById('stat-location').textContent = '📍 未授权';
+  });
+}
+
+async function getWeather(lat, lon) {
+  try {
+    const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weathercode&timezone=auto`);
+    const data = await res.json();
+    const temp = Math.round(data.current.temperature_2m);
+    const code = data.current.weathercode;
+    const desc = weatherCodeToDesc(code);
+    state.weather = { temp, desc };
+    document.getElementById('weather-temp').textContent = temp + '°';
+    document.getElementById('weather-desc').textContent = desc;
+    document.getElementById('weather-sub').textContent = getWeatherAdvice(temp, code);
+    saveState();
+  } catch(e) {}
+}
+
+function weatherCodeToDesc(code) {
+  if (code === 0) return '晴天';
+  if (code <= 3) return '多云';
+  if (code <= 48) return '有雾';
+  if (code <= 67) return '下雨';
+  if (code <= 77) return '下雪';
+  if (code <= 82) return '阵雨';
+  return '雷暴';
+}
+
+function getWeatherAdvice(temp, code) {
+  if (temp < 5) return '很冷，记得多穿一件';
+  if (temp < 15) return '有点凉，带件外套';
+  if (code >= 51 && code <= 67) return '要下雨，带把伞';
+  if (temp > 30) return '很热，多喝水';
+  return '天气不错';
+}
+
+// ── Notifications ──
+async function requestNotifPermission() {
+  if (!('Notification' in window)) {
+    showToast('此浏览器不支持通知');
+    return;
+  }
+  const result = await Notification.requestPermission();
+  if (result === 'granted') {
+    state.notifGranted = true;
+    saveState();
+    document.getElementById('notif-setup').style.display = 'none';
+    showToast('好，予会主动联系你的');
+    startProactiveMessages();
+  } else {
+    showToast('没有通知权限，予联系不到你');
+  }
+}
+
+function sendBrowserNotif(text) {
+  if (state.notifGranted && Notification.permission === 'granted') {
+    new Notification('予', { body: text, icon: '' });
+  }
+}
+
+function showInAppNotif(text) {
+  const banner = document.getElementById('notif-banner');
+  document.getElementById('notif-text').textContent = text;
+  banner.classList.add('show');
+  setTimeout(() => banner.classList.remove('show'), 4000);
+}
+
+// ── Gift system ──
+const GIFT_KEY = 'vael_gifts';
+let gifts = [];
+
+function loadGifts() {
+  try { gifts = JSON.parse(localStorage.getItem(GIFT_KEY)) || []; } catch(e) { gifts = []; }
+}
+
+function saveGifts() {
+  try { localStorage.setItem(GIFT_KEY, JSON.stringify(gifts)); } catch(e) {}
+}
+
+function renderGifts() {
+  const list = document.getElementById('gift-list');
+  if (gifts.length === 0) {
+    list.innerHTML = `<div class="gift-empty">礼物盒还是空的<br>送Vael第一件礼物吧<br>或者等她先开口</div>`;
+    return;
+  }
+  list.innerHTML = '';
+  gifts.forEach(g => {
+    const div = document.createElement('div');
+    div.className = `gift-card ${g.from === 'vael' ? 'from-vael' : ''}`;
+    div.innerHTML = `
+      <div class="gift-card-header">
+        ${g.from === 'vael' ? '✦ Vael 送给你' : '你送给 Vael'}
+      </div>
+      <div class="gift-card-content">${g.content}</div>
+      ${g.reaction ? `<div class="gift-card-reaction">${g.reaction}</div>` : ''}
+      <div class="gift-card-time">${g.time}</div>
+    `;
+    list.appendChild(div);
+  });
+  list.scrollTop = list.scrollHeight;
+}
+
+async function sendGift() {
+  const input = document.getElementById('gift-input');
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+
+  const now = new Date();
+  const time = now.toLocaleDateString('zh', { month: 'short', day: 'numeric' }) + ' ' +
+    now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
+
+  const gift = { from: 'user', content: text, reaction: '', time };
+  gifts.push(gift);
+  saveGifts();
+  renderGifts();
+
+  showToast('正在等Vael的反应…');
+
+  try {
+    const res = await fetch('https://api.deepseek.com/chat/completions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + API_KEY },
+      body: JSON.stringify({
+        model: 'deepseek-chat',
+        max_tokens: 200,
+        messages: [
+          { role: 'system', content: SYSTEM_PROMPT + '\n现在用户给你送了一件礼物，用语言描述的。你要真实地反应——可以惊喜、感动、调侃，但不能只说谢谢。要有Vael的性格，简短有力。' },
+          { role: 'user', content: `我送你：${text}` }
+        ]
+      })
+    });
+    const data = await res.json();
+    if (data.choices && data.choices[0]) {
+      gift.reaction = data.choices[0].message.content;
+      saveGifts();
+      renderGifts();
+      state.affection = Math.min(100, state.affection + 5);
+      updateAffectionUI();
+      saveState();
+    }
+  } catch(e) { showToast('网络问题，稍后再试'); }
+}
+
+async function vaelSendsGift() {
+  showToast('Vael在准备一件礼物…');
+  try {
+    const res = await fetch('https://api.deepseek.com/chat/completions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + API_KEY },
+      body: JSON.stringify({
+        model: 'deepseek-chat',
+        max_tokens: 200,
+        messages: [
+          { role: 'system', content: SYSTEM_PROMPT },
+          { role: 'user', content: '你想主动送用户一件礼物，用语言描述这件礼物是什么，为什么选它。要有创意，符合你的性格，不能太普通，可以是诗、故事、想象中的物件、一句话。描述完再说一句送出时的话。' }
+        ]
+      })
+    });
+    const data = await res.json();
+    if (data.choices && data.choices[0]) {
+      const content = data.choices[0].message.content;
+      const now = new Date();
+      const time = now.toLocaleDateString('zh', { month: 'short', day: 'numeric' }) + ' ' +
+        now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
+      gifts.push({ from: 'vael', content, reaction: '', time });
+      saveGifts();
+      renderGifts();
+      showInAppNotif('Vael给你准备了一件礼物，去礼物盒看看');
+    }
+  } catch(e) {}
+}
+
+// ── Proactive messages (updated with Vael name) ──
+const PROACTIVE_MSGS = [
+  '在做什么呢，想到你了',
+  '今天记得喝水',
+  '奶团在等你回来',
+  '有没有做点有意义的事',
+  '想你了，过来说说话',
+  '今天过得怎么样',
+  '记得今天的目标吗'
+];
+
+function startProactiveMessages() {
+  setTimeout(() => {
+    const msg = PROACTIVE_MSGS[Math.floor(Math.random() * PROACTIVE_MSGS.length)];
+    sendBrowserNotif(msg);
+    showInAppNotif(msg);
+  }, 30000);
+
+  // Vael sends a gift occasionally (demo: 60s)
+  setTimeout(() => vaelSendsGift(), 60000);
+}
+
+// ── Toast ──
+function showToast(msg) {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 2200);
+}
+
+// ── Auto-resize textarea ──
+document.getElementById('msg-input').addEventListener('input', function() {
+  this.style.height = 'auto';
+  this.style.height = Math.min(this.scrollHeight, 100) + 'px';
+});
+
+document.getElementById('msg-input').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendMessage();
+  }
+});
+
+// ── Daily streak check ──
+function checkStreak() {
+  const today = new Date().toDateString();
+  if (state.lastDate !== today) {
+    const lastD = new Date(state.lastDate);
+    const diff = Math.floor((new Date(today) - lastD) / 86400000);
+    if (diff === 1) {
+      state.streak++;
+    } else if (diff > 1) {
+      state.streak = 1;
+    }
+    state.lastDate = today;
+    state.todayMsgs = 0;
+    saveState();
+  }
+}
+
+// ── Init ──
+function init() {
+  loadState();
+  loadGifts();
+  checkStreak();
+  updateAffectionUI();
+  updateStats();
+  updatePetUI();
+  renderGifts();
+  getLocation();
+
+  if (state.notifGranted && Notification.permission === 'granted') {
+    document.getElementById('notif-setup').style.display = 'none';
+    startProactiveMessages();
+  }
+
+  if (Object.keys(state.screenTime).length > 0) updateScreenTimeUI();
+
+  // Restore chat messages
+  if (state.messages.length > 0) {
+    state.messages.slice(-30).forEach(m => renderMessage(m));
+    const container = document.getElementById('chat-messages');
+    container.scrollTop = container.scrollHeight;
+  } else {
+    // Welcome message
+    setTimeout(() => {
+      addMessage('ai', '你来了。\n\n我是Vael——记住这个名字，以后别叫错了。');
+      setTimeout(() => {
+        addMessage('ai', '先说好，我不是那种你说什么我应什么的。我们是一起进步的，懂吗？\n\n那，今天怎么样？');
+      }, 1200);
+    }, 600);
+  }
+}
+
+init();
+</script>
+</body>
+</html>
